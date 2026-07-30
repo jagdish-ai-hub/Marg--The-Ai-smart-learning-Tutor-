@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Environment — never commit real API keys
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Uploads / temp
+uploads/
+tmp/
+
+# Future: local SQLite / Turso database files
+*.db
+*.db-journal
+*.sqlite
