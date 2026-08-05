@@ -110,6 +110,23 @@ The tests run entirely against the mock provider — offline, deterministic, and
 free. 52 tests covering the happy path, every error code, the reveal gate, SSE
 streaming, and the guardrail decision table.
 
+## Deploying to Render
+
+This repository includes a `render.yaml` Blueprint for both services:
+
+- `marg-api` — Node/Express API with `/health` as its health check
+- `marg-web` — Astro static frontend built from the `web/` directory
+
+In Render, choose **New > Blueprint**, connect this repository, and apply the
+Blueprint. Render generates `JWT_SECRET` automatically. The default deployment
+uses `AI_PROVIDER=mock`, so it starts without an API key; set `AI_PROVIDER` and
+the matching provider key in the `marg-api` service to enable a real model.
+
+The Blueprint assumes the default Render URLs `marg-api.onrender.com` and
+`marg-web.onrender.com`. If you rename either service or add a custom domain,
+update `PUBLIC_MARG_API` on `marg-web` and `CORS_ORIGINS` on `marg-api`, then
+redeploy the frontend.
+
 ---
 
 ## A note on data

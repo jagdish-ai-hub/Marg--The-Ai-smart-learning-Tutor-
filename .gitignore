@@ -21,6 +21,7 @@ Thumbs.db
 # Uploads / temp
 uploads/
 tmp/
+web/dist/
 
 # Future: local SQLite / Turso database files
 *.db
