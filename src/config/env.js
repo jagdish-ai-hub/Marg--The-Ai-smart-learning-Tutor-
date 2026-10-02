@@ -212,11 +212,14 @@ export const env = Object.freeze({
   AI_TIMEOUT_MS: readNumber('AI_TIMEOUT_MS', 60_000),
 
   GEMINI_API_KEY,
-  GEMINI_MODEL: readString('GEMINI_MODEL', { fallback: 'gemini-2.5-flash' }),
+  // gemini-2.5-flash is no longer available to new Google AI Studio accounts
+  // (confirmed live: it 404s with a message pointing at a newer model).
+  // gemini-3.5-flash-lite is the verified-working default — see docs/ARCHITECTURE.md.
+  GEMINI_MODEL: readString('GEMINI_MODEL', { fallback: 'gemini-3.5-flash-lite' }),
 
   OPENROUTER_API_KEY,
   OPENROUTER_BASE_URL: readString('OPENROUTER_BASE_URL', { fallback: 'https://openrouter.ai/api/v1' }),
-  OPENROUTER_MODEL: readString('OPENROUTER_MODEL', { fallback: 'google/gemini-2.5-flash' }),
+  OPENROUTER_MODEL: readString('OPENROUTER_MODEL', { fallback: 'google/gemini-3.5-flash-lite' }),
 
   OPENAI_COMPATIBLE_API_KEY,
   OPENAI_COMPATIBLE_BASE_URL,
