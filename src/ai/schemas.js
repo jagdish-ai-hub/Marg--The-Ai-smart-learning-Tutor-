@@ -52,8 +52,15 @@ export const TriageSchema = z.object({
   mode: z.enum(['guide', 'explain', 'discuss', 'check']),
   /** True when the student is explicitly asking for the final answer. */
   wantsAnswer: z.boolean(),
-  /** One short sentence explaining the call. Logged, never shown to students. */
-  reason: z.string(),
+  /**
+   * One short sentence explaining the call. Logged, never shown to students —
+   * and never read for any functional decision, which is exactly why this is
+   * optional. Providers without strict schema enforcement (anything running
+   * through the json_object fallback in openaiCompatible.js) don't reliably
+   * include every field the prompt asks for, and this is the one field that
+   * is safe to simply go missing.
+   */
+  reason: z.string().optional(),
 });
 
 /** @see TriageSchema */
@@ -68,7 +75,7 @@ export const triageJsonSchema = {
     wantsAnswer: { type: 'boolean' },
     reason: { type: 'string' },
   },
-  required: ['inScope', 'category', 'integrityRisk', 'mode', 'wantsAnswer', 'reason'],
+  required: ['inScope', 'category', 'integrityRisk', 'mode', 'wantsAnswer'],
 };
 
 // ---------------------------------------------------------------------------

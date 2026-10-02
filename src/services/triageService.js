@@ -67,7 +67,14 @@ export async function triageMessage({ message, session, signal }) {
       messages: [{ role: 'user', content: context }],
       // Classification should be repeatable, so temperature is as low as it goes.
       temperature: 0,
-      maxTokens: 300,
+      // Reasoning models (DeepSeek's flash tier, among others) spend part of
+      // this budget on an internal reasoning pass before ever emitting the
+      // final JSON — measured at ~140-180 reasoning tokens alone for this
+      // prompt, with real variance between calls even at temperature 0. 300
+      // was too tight a margin and occasionally got cut off mid-answer,
+      // producing an empty response. 600 leaves real headroom while staying
+      // cheap — this is still the "fast" tier, not the main teaching call.
+      maxTokens: 600,
       tier: 'fast',
       signal,
     });
