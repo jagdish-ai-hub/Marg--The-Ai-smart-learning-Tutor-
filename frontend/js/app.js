@@ -10,6 +10,9 @@ import { icons } from './icons.js';
 import { escapeHtml, timeAgo, toast } from './format.js';
 import { renderShell } from './shell.js';
 import { renderSubjectTiles, accentClass } from './subjects-ui.js';
+import { registerServiceWorker } from './pwa.js';
+
+registerServiceWorker();
 
 const marg = new MargClient(API_BASE);
 renderShell('home');

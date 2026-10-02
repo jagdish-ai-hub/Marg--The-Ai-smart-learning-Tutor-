@@ -105,6 +105,11 @@ factoring. That is the thing a human tutor does that a grading app does not.
 Plus: practice generation ("5 more like this"), a standalone concept explainer,
 and photo upload that reads **every** problem on a page rather than one.
 
+**It installs.** The frontend is a real web app — a manifest, a proper icon set
+(standard and maskable), and a service worker caching the app shell. "Add to
+Home Screen" on mobile or "Install" from the browser's address bar puts Marg
+on your device like any native app, opening straight to the subject picker.
+
 ---
 
 ## Provider support
@@ -165,6 +170,14 @@ src/
   utils/           errors, SSE, ids, logging, serialisation
 tests/             offline test suite
 docs/              API reference, frontend guide, architecture
+
+frontend/
+  index.html, app.html, session.html, insights.html   the four screens
+  css/             design tokens, base components, per-screen styles
+  js/              marg-client.js (the API client), one module per screen
+  manifest.json    makes the app installable
+  sw.js            service worker — caches the app shell
+  icons/           app icons (standard + maskable, 192/512)
 ```
 
 Every exported function carries a JSDoc comment explaining what it does and why.

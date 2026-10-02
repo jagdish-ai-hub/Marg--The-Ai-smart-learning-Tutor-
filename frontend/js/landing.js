@@ -8,6 +8,9 @@
 import { MargClient } from './marg-client.js';
 import { API_BASE } from './config.js';
 import { renderSubjectPills } from './subjects-ui.js';
+import { registerServiceWorker } from './pwa.js';
+
+registerServiceWorker();
 
 const marg = new MargClient(API_BASE);
 

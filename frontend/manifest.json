@@ -1,0 +1,55 @@
+{
+  "name": "Marg — AI Tutor",
+  "short_name": "Marg",
+  "description": "An AI tutor that shows its work. Breaks every problem into steps, checks your reasoning, and circles exactly where it went right.",
+  "start_url": "app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0d1512",
+  "theme_color": "#0d1512",
+  "lang": "en",
+  "categories": ["education"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start a session",
+      "short_name": "New session",
+      "description": "Jump straight to picking a subject and describing a problem",
+      "url": "app.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Insights",
+      "short_name": "Insights",
+      "description": "See your recurring mistake patterns",
+      "url": "insights.html",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

@@ -10,6 +10,9 @@ import { icons } from './icons.js';
 import { escapeHtml } from './format.js';
 import { renderShell } from './shell.js';
 import { accentClass } from './subjects-ui.js';
+import { registerServiceWorker } from './pwa.js';
+
+registerServiceWorker();
 
 const marg = new MargClient(API_BASE);
 renderShell('insights');

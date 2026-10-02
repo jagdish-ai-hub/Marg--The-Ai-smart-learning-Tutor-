@@ -9,6 +9,9 @@ import { API_BASE } from './config.js';
 import { icons } from './icons.js';
 import { escapeHtml, toast } from './format.js';
 import { renderShell } from './shell.js';
+import { registerServiceWorker } from './pwa.js';
+
+registerServiceWorker();
 
 const marg = new MargClient(API_BASE);
 renderShell();
