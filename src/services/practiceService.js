@@ -55,7 +55,9 @@ export async function generatePractice({ userId, session, steps, count = 3, skil
       content: `The student just worked on: ${session.restatedProblem}\n\nGenerate ${count} problems drilling "${targetSkill}".`,
     }],
     temperature: 0.8, // Higher: repetitive practice problems would defeat the point.
-    maxTokens: 1200,
+    // Reasoning headroom — see sessionService.js's step_plan call for the
+    // measurements behind this margin.
+    maxTokens: 2200,
     signal,
   });
 
@@ -125,7 +127,9 @@ The nudge should name the single thing worth practising next.
 Reply with JSON only.`,
     messages: [{ role: 'user', content: comparison }],
     temperature: 0.1,
-    maxTokens: 1000,
+    // Reasoning headroom — see sessionService.js's step_plan call for the
+    // measurements behind this margin.
+    maxTokens: 1800,
     signal,
   });
 

@@ -96,7 +96,13 @@ export async function createSession({ userId, subjectId, problem, answerPolicy, 
     system: buildStepPlanPrompt(subjectId),
     messages: [{ role: 'user', content: problem }],
     temperature: 0.2,
-    maxTokens: 1200,
+    // Reasoning models (see triageService.js) can spend several hundred tokens
+    // on an internal reasoning pass before the JSON itself — measured up to
+    // ~380 reasoning tokens for a moderate step plan, with real variance
+    // between calls. 1200 occasionally got cut off empty; 2500 leaves safe
+    // headroom against worst-case variance without materially changing cost
+    // for providers that don't reason (they simply stop early).
+    maxTokens: 2500,
     signal,
   });
 

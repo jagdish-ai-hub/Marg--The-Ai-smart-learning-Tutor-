@@ -67,7 +67,9 @@ export async function transcribeImage({ buffer, mimeType, signal }) {
       images: [{ mimeType, data: buffer.toString('base64') }],
     }],
     temperature: 0, // Transcription is copying, not creating.
-    maxTokens: 1500,
+    // Reasoning headroom — see sessionService.js's step_plan call for the
+    // measurements behind this margin.
+    maxTokens: 2500,
     signal,
   });
 

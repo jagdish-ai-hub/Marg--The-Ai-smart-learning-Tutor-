@@ -49,7 +49,10 @@ export async function checkAttempt({ session, steps, userId, attempt, stepId, si
     system: buildMarkingPrompt(session, steps),
     messages: [{ role: 'user', content: context }],
     temperature: 0.1,
-    maxTokens: 1200,
+    // Reasoning models spend part of this budget thinking before the JSON
+    // itself — see the comment in sessionService.js's step_plan call for the
+    // measurements behind this margin.
+    maxTokens: 2200,
     signal,
   });
 
