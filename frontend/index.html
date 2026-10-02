@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marg — an AI tutor that shows its work</title>
+  <meta name="description" content="Next time you're stuck, ask. Marg walks through every problem with you, breaking it into steps and showing exactly where it went right." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+</head>
+<body>
+  <header class="landing-nav">
+    <div class="landing-nav__inner">
+      <a href="index.html" class="landing-brand">
+        <span class="script">Marg</span>
+        <span class="eyebrow">AI Tutor</span>
+      </a>
+      <a href="app.html" class="btn btn-accent">Start free</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero page-enter">
+      <p class="eyebrow">— An AI tutor that shows its work</p>
+      <h1 class="hero-heading">
+        <span class="strike">Stuck</span> isn't the end.<br />
+        It's the <span class="script accent-italic">question</span>.
+      </h1>
+      <p class="hero-copy">
+        Marg walks through every problem with you — math, physics, code, chemistry —
+        breaking it into steps, checking your reasoning, and circling exactly where
+        it went right. Like a tutor leaning over your shoulder, minus the schedule.
+      </p>
+      <a href="app.html" class="btn btn-accent btn-lg">Start a session</a>
+    </section>
+
+    <section class="example-section">
+      <button class="btn btn-ghost example-toggle" id="example-toggle" aria-expanded="false" aria-controls="example-card">
+        See a worked example ↓
+      </button>
+
+      <div class="example-thread" id="example-card" hidden>
+        <div class="bubble bubble-user">wait, why does the sign flip here?</div>
+        <div class="bubble bubble-assistant">because you divided by a negative — try that step again</div>
+
+        <div class="mock-card">
+          <p class="mock-card__label">SESSION · QUADRATIC EQUATIONS <span class="mock-dots">●●●</span></p>
+          <p class="mock-card__problem"><span class="text-dim">solve →</span> 2x² − 5x − 3 = 0</p>
+          <ol class="mock-steps">
+            <li><span class="mock-steps__num">01</span> factor: (2x + 1)(x − 3) = 0</li>
+            <li><span class="mock-steps__num">02</span> set each factor to zero</li>
+            <li class="mock-steps__final">
+              <span class="mock-steps__num">03</span> x = −1/2&nbsp;&nbsp;or&nbsp;&nbsp;x = 3
+              <svg class="mock-arrow" viewBox="0 0 220 60" aria-hidden="true">
+                <path d="M4 8 C 60 40, 140 40, 200 12" fill="none" stroke="var(--step-correct)" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </li>
+          </ol>
+          <div class="mock-progress">
+            <span style="background:var(--dot-amber)"></span>
+            <span style="background:var(--step-correct)"></span>
+            <span style="background:var(--dot-blue)"></span>
+            <span style="background:var(--danger)"></span>
+          </div>
+          <p class="mock-nice script">nice!</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works" id="how-it-works">
+      <p class="eyebrow">How a session runs</p>
+      <h2 class="section-heading">Three steps. Every time.</h2>
+
+      <div class="how-card">
+        <span class="how-card__num script">01</span>
+        <h3>Ask what's stuck</h3>
+        <p class="text-dim">Type the problem in your own words, paste your working, or snap a photo of the page. No need to phrase it perfectly.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-card__num script">02</span>
+        <h3>Work through it together</h3>
+        <p class="text-dim">Marg breaks it into steps and asks you to try each one, checking your reasoning as you go rather than jumping straight to the answer.</p>
+      </div>
+      <div class="how-card">
+        <span class="how-card__num script">03</span>
+        <h3>Get marked, not just graded</h3>
+        <p class="text-dim">See exactly which step went sideways and why, circled right on the page — not just a final right-or-wrong.</p>
+      </div>
+    </section>
+
+    <section class="subjects-section" id="subjects">
+      <p class="eyebrow">What Marg tutors</p>
+      <h2 class="section-heading">Pick a subject. Bring a real problem.</h2>
+      <div class="subjects-grid" id="subjects-grid">
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+    </section>
+
+    <section class="testimonial-section">
+      <blockquote class="testimonial">
+        "I stopped dreading word problems once I could see <span class="underline-ink">where my logic</span> actually broke, instead of just being told I was wrong."
+      </blockquote>
+      <p class="testimonial__attr text-dim">
+        Second-year engineering student · used Marg for a semester of calculus
+      </p>
+    </section>
+
+    <section class="cta-section">
+      <h2 class="hero-heading hero-heading--small">Next time you're stuck, <span class="script accent-italic">ask</span>.</h2>
+      <p class="hero-copy">Free to start. No credit card, no scheduling a slot.</p>
+      <a href="app.html" class="btn btn-accent btn-lg">Start a session</a>
+    </section>
+  </main>
+
+  <footer class="landing-footer">
+    <div class="landing-footer__brand">
+      <span class="script">Marg</span>
+      <span class="text-dim">— an AI tutor that shows its work</span>
+    </div>
+    <nav class="landing-footer__links">
+      <a href="index.html#how-it-works">How it works</a>
+      <a href="index.html#subjects">Subjects</a>
+      <a href="app.html">Students</a>
+    </nav>
+  </footer>
+
+  <script type="module" src="js/landing.js"></script>
+</body>
+</html>

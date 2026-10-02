@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marg — session</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <header><div id="shell"></div></header>
+
+  <div class="session-subheader">
+    <button class="btn-icon" id="back-btn" title="Back to home"><span id="back-icon"></span></button>
+    <div class="session-subheader__title" id="session-title-display">Loading…</div>
+    <div class="session-subheader__actions">
+      <button class="btn-icon" id="rename-btn" title="Rename"><span id="rename-icon"></span></button>
+      <button class="btn-icon" id="delete-btn" title="Delete"><span id="delete-icon"></span></button>
+    </div>
+  </div>
+
+  <main class="session-layout page-enter">
+    <section class="step-card card" id="step-card">
+      <p class="step-card__label">SESSION · <span id="subject-label"></span></p>
+      <h2 id="restated-problem" class="step-card__problem"></h2>
+      <ol class="step-list" id="step-list">
+        <li class="skeleton skeleton-line w-80"></li>
+        <li class="skeleton skeleton-line w-60"></li>
+        <li class="skeleton skeleton-line w-80"></li>
+      </ol>
+      <div class="progress-bar" id="progress-bar"></div>
+      <button class="btn btn-ghost btn-block btn-sm" id="practice-btn" style="margin-top: var(--sp-4);" hidden>
+        5 more like this
+      </button>
+    </section>
+
+    <section class="transcript-panel">
+      <div class="transcript" id="transcript" aria-live="polite"></div>
+
+      <footer class="composer">
+        <div class="mode-toggle" id="mode-toggle">
+          <button type="button" data-mode="ask" class="is-active">Ask</button>
+          <button type="button" data-mode="check">Check my work</button>
+        </div>
+        <textarea id="composer-input" rows="2" placeholder="Type your question, or paste your working…"></textarea>
+        <div class="spread composer-footer-actions">
+          <div class="row row-gap-2">
+            <button class="btn btn-ghost btn-sm" id="hint-btn">
+              <span id="hint-icon"></span> Hint
+            </button>
+            <button class="btn btn-ghost btn-sm" id="reveal-btn">Show me the answer</button>
+          </div>
+          <button class="btn btn-accent" id="send-btn">
+            <span id="send-icon"></span>
+          </button>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <script type="module" src="js/session.js"></script>
+</body>
+</html>

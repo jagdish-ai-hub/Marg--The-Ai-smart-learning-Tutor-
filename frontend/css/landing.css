@@ -1,0 +1,220 @@
+/**
+ * Landing-page-only styles. Everything here is decorative marketing content —
+ * the mocked session card in .example-thread is hand-coded to match the
+ * screenshot exactly and is NOT wired to live data (unlike the real session
+ * screen in app.css / session.html).
+ */
+
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+}
+.landing-nav__inner {
+  max-width: var(--content-width-wide);
+  margin: 0 auto;
+  padding: var(--sp-4) var(--sp-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.landing-brand {
+  display: flex;
+  align-items: baseline;
+  gap: var(--sp-2);
+  text-decoration: none;
+  color: var(--text);
+}
+.landing-brand .script { font-size: var(--text-xl); color: var(--accent); }
+
+main { max-width: var(--content-width-wide); margin: 0 auto; padding: 0 var(--sp-5); }
+
+.btn-lg { padding: var(--sp-4) var(--sp-6); font-size: var(--text-base); }
+
+/* --- hero --- */
+
+.hero {
+  padding: var(--sp-8) 0 var(--sp-6);
+  text-align: left;
+}
+.hero-heading {
+  font-size: var(--text-2xl);
+  line-height: var(--leading-tight);
+  font-weight: 800;
+  margin: var(--sp-3) 0 var(--sp-5);
+}
+.hero-heading--small { margin-top: 0; }
+.hero-heading .strike { position: relative; }
+.hero-heading .strike::after {
+  content: '';
+  position: absolute;
+  left: -2%; right: -2%; top: 52%;
+  height: 2px;
+  background: var(--text);
+  transform: rotate(-3deg);
+}
+.hero-heading .script { font-size: 1.15em; font-weight: 400; }
+.hero-copy {
+  color: var(--text-dim);
+  font-size: var(--text-base);
+  max-width: 46ch;
+  margin-bottom: var(--sp-6);
+}
+
+/* --- example / mocked session card --- */
+
+.example-section { padding-bottom: var(--sp-7); }
+.example-toggle { margin-bottom: var(--sp-5); }
+
+.example-thread {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  animation: page-enter var(--dur-slow) var(--ease) both;
+}
+
+.mock-card {
+  margin-top: var(--sp-3);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: var(--sp-5);
+}
+.mock-card__label {
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--text-faint);
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--sp-4);
+}
+.mock-dots { letter-spacing: 2px; color: var(--border-strong); }
+.mock-card__problem {
+  font-size: var(--text-lg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  margin-bottom: var(--sp-4);
+}
+.mock-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--text-sm);
+  padding-bottom: var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--sp-4);
+}
+.mock-steps__num { color: var(--text-faint); margin-right: var(--sp-3); }
+.mock-steps__final { position: relative; color: var(--step-correct); }
+.mock-arrow {
+  position: absolute;
+  left: 40%;
+  top: 100%;
+  width: 160px;
+  height: 44px;
+  pointer-events: none;
+}
+.mock-progress {
+  display: flex;
+  gap: 3px;
+  margin-bottom: var(--sp-3);
+}
+.mock-progress span {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-pill);
+}
+.mock-nice {
+  text-align: right;
+  color: var(--step-correct);
+  font-size: var(--text-xl);
+  margin: 0;
+}
+
+/* --- how it works --- */
+
+.how-it-works { padding: var(--sp-7) 0; }
+.section-heading { font-size: var(--text-xl); font-weight: 800; margin: var(--sp-2) 0 var(--sp-6); }
+.how-card {
+  padding: var(--sp-6) 0;
+  border-top: 1px solid var(--border);
+}
+.how-card:last-child { border-bottom: 1px solid var(--border); }
+.how-card__num { font-size: var(--text-2xl); color: var(--accent); display: block; margin-bottom: var(--sp-2); }
+.how-card h3 { font-size: var(--text-lg); margin-bottom: var(--sp-2); }
+.how-card p { max-width: 46ch; }
+
+/* --- subjects --- */
+
+.subjects-section { padding: var(--sp-7) 0; }
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--sp-3);
+}
+.subject-pill {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color var(--dur-base) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.subject-pill:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+/* --- testimonial --- */
+
+.testimonial-section { padding: var(--sp-8) 0; text-align: center; }
+.testimonial {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  margin: 0 auto var(--sp-4);
+  max-width: 42ch;
+}
+.underline-ink { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.testimonial__attr { font-size: var(--text-sm); }
+
+/* --- closing CTA --- */
+
+.cta-section {
+  text-align: center;
+  padding: var(--sp-8) 0 var(--sp-7);
+  border-top: 1px solid var(--border);
+}
+.cta-section .hero-copy { margin-left: auto; margin-right: auto; }
+
+/* --- footer --- */
+
+.landing-footer {
+  border-top: 1px solid var(--border);
+  padding: var(--sp-6) var(--sp-5);
+  max-width: var(--content-width-wide);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+.landing-footer__brand { display: flex; align-items: baseline; gap: var(--sp-2); }
+.landing-footer__brand .script { font-size: var(--text-lg); color: var(--accent); }
+.landing-footer__links { display: flex; gap: var(--sp-5); flex-wrap: wrap; }
+.landing-footer__links a { color: var(--text-dim); text-decoration: none; font-size: var(--text-sm); }
+.landing-footer__links a:hover { color: var(--text); }
+
+@media (min-width: 768px) {
+  .hero { text-align: center; padding-top: var(--sp-8); }
+  .hero-copy { margin-left: auto; margin-right: auto; }
+  .how-it-works { display: grid; grid-template-columns: 1fr 2fr; gap: var(--sp-6); align-items: start; }
+  .how-it-works .eyebrow, .how-it-works .section-heading { grid-column: 1; }
+  .how-card { grid-column: 2; padding-top: 0; border-top: none; padding-bottom: var(--sp-6); border-bottom: 1px solid var(--border); }
+  .how-card:first-of-type { grid-row: 1; }
+}

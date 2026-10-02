@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marg — insights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <header><div id="shell"></div></header>
+
+  <main class="app-container page-enter">
+    <div class="spread" style="margin-bottom: var(--sp-6); flex-wrap: wrap; gap: var(--sp-3);">
+      <div>
+        <h1 style="font-size: var(--text-xl);">Insights</h1>
+        <p class="text-dim">What you're getting right, and what keeps tripping you up.</p>
+      </div>
+      <select id="window-select" class="input" style="width: auto;">
+        <option value="7">Last 7 days</option>
+        <option value="30" selected>Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+    </div>
+
+    <section class="stat-row" id="stat-row">
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+      <div class="skeleton skeleton-card"></div>
+    </section>
+
+    <section class="stack" style="margin-top: var(--sp-6);">
+      <div class="card" id="subject-bars-card">
+        <h3 style="margin-bottom: var(--sp-4);">Sessions by subject</h3>
+        <div id="subject-bars"><div class="skeleton skeleton-line w-80"></div></div>
+      </div>
+    </section>
+
+    <section style="margin-top: var(--sp-7);">
+      <h2 style="font-size: var(--text-lg); margin-bottom: var(--sp-4);">Recurring mistakes</h2>
+      <div class="stack" id="weakness-list">
+        <div class="skeleton skeleton-card"></div>
+        <div class="skeleton skeleton-card"></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="js/insights.js"></script>
+</body>
+</html>

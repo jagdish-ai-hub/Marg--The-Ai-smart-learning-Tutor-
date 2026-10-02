@@ -1,19 +1,30 @@
-# Marg — Backend
+# Marg
 
-The API behind **Marg**, an AI tutor that shows its work.
+**Marg** is an AI tutor that shows its work.
 
 A student brings a real problem — typed, pasted, or photographed. Marg breaks it
 into numbered steps, asks them to try each one, then *marks* the attempt: it
 circles the exact step that went sideways and explains why, instead of returning
 a bare right-or-wrong.
 
-This repository is **backend only**. No frontend, no UI, no browser build tooling.
+This repository has two parts:
+
+- **`src/`** — the backend: a Node/Express JSON+SSE API. See [docs/API.md](docs/API.md).
+- **`frontend/`** — a plain HTML/CSS/JS frontend (no build step, no framework)
+  implementing the full product: landing page, subject picker, the tutoring
+  session screen, and the mistake/weakness insights dashboard.
+
+The two are decoupled on purpose — the frontend talks to the backend purely
+over HTTP/SSE, so either can be deployed independently. See
+[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for why.
 
 ---
 
 ## Running it in under a minute
 
 You need [Node.js 20 or newer](https://nodejs.org).
+
+**1. Start the backend:**
 
 ```bash
 git clone <this repo>
@@ -25,6 +36,20 @@ npm run dev
 ```
 
 Open <http://localhost:4000/health> — you should see `{"ok":true,...}`.
+
+**2. Serve the frontend** (in a second terminal, from the repo root):
+
+```bash
+npx serve frontend -l 8080
+```
+
+Open <http://localhost:8080> in your browser. No build step — it's plain files;
+`npx serve` (or `python3 -m http.server -d frontend 8080`, or any static
+server) is only needed because ES module imports require `http://`, not `file://`.
+
+If your static server runs on a different port, add it to `CORS_ORIGINS` in
+`.env` (`localhost:5173` and `localhost:3000` are already allowed by default —
+typical Vite/CRA dev ports).
 
 **No API key? You do not need one to start.** `.env.example` ships with
 `AI_PROVIDER=mock`, which returns realistic canned replies with no network calls.

@@ -1,0 +1,90 @@
+/**
+ * Design tokens — the single source of truth for color, type, space, motion.
+ * Every other stylesheet reads from these custom properties. Change a value
+ * here and it propagates everywhere; nothing else should hardcode a color.
+ */
+
+:root {
+  /* --- surfaces --- */
+  --bg: #0d1512;
+  --bg-raised: #131f1a;
+  --bg-raised-2: #182620;
+  --bg-overlay: rgba(8, 13, 11, 0.72);
+  --border: rgba(245, 240, 230, 0.10);
+  --border-strong: rgba(245, 240, 230, 0.18);
+
+  /* --- text --- */
+  --text: #f2ece0;
+  --text-dim: rgba(242, 236, 224, 0.65);
+  --text-faint: rgba(242, 236, 224, 0.40);
+
+  /* --- accent (amber/gold) --- */
+  --accent: #e8b84f;
+  --accent-strong: #d4a43a;
+  --accent-soft: rgba(232, 184, 79, 0.14);
+  --accent-ink: #17130d;
+
+  /* --- subject accent tokens (backend sends the string, never a hex code) --- */
+  --dot-amber: #e8b84f;
+  --dot-blue: #6fa8ff;
+  --dot-green: #4fc38a;
+  --dot-rose: #e57e93;
+
+  /* --- step / verdict status --- */
+  --step-pending: var(--text-faint);
+  --step-active: var(--accent);
+  --step-correct: #4fc38a;
+  --step-incorrect: #e57e93;
+  --step-revealed: #8aa0b8;
+
+  /* --- semantic --- */
+  --danger: #e57e93;
+  --success: #4fc38a;
+  --info: #6fa8ff;
+
+  /* --- radius --- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  /* --- spacing scale (4px base) --- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+
+  /* --- type --- */
+  --font-body: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-script: "Caveat", var(--font-body);
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.75rem;
+  --text-2xl: clamp(2rem, 8vw, 2.75rem);
+
+  --leading-tight: 1.15;
+  --leading-normal: 1.5;
+  --tracking-wide: 0.08em;
+
+  /* --- motion --- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 100ms;
+  --dur-base: 200ms;
+  --dur-slow: 350ms;
+
+  /* --- elevation --- */
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.45);
+  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.35);
+
+  /* --- layout --- */
+  --content-width: 480px;
+  --content-width-wide: 720px;
+  --shell-width: 1080px;
+}

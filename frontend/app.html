@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marg — start a session</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" />
+  <link rel="stylesheet" href="css/tokens.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+  <header><div id="shell"></div></header>
+
+  <main class="app-container-narrow page-enter">
+    <div class="spread" style="margin-bottom: var(--sp-5);">
+      <h1 style="font-size: var(--text-xl);">What are you stuck on?</h1>
+      <button class="btn btn-quiet" id="concept-btn">
+        <span id="concept-icon"></span> Ask a concept
+      </button>
+    </div>
+
+    <section class="stack">
+      <div>
+        <p class="eyebrow" style="margin-bottom: var(--sp-3);">Pick a subject</p>
+        <div class="subjects-grid" id="subjects-grid">
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+        </div>
+      </div>
+
+      <div class="composer-card card">
+        <textarea id="problem-input" rows="3" placeholder="Type the problem in your own words, or paste your working…"></textarea>
+        <div id="photo-preview" class="photo-preview" hidden></div>
+        <p class="field-error" id="composer-error" hidden></p>
+        <div class="spread composer-card__actions">
+          <button class="btn-icon" id="photo-btn" type="button" title="Snap a photo of the page" hidden>
+            <span id="camera-icon"></span>
+          </button>
+          <input type="file" id="photo-input" accept="image/*" capture="environment" hidden />
+          <button class="btn btn-accent" id="start-session-btn">Start a session</button>
+        </div>
+      </div>
+
+      <div id="refusal-banner" class="bubble bubble-assistant refused" hidden></div>
+
+      <div>
+        <p class="eyebrow" style="margin-bottom: var(--sp-3);">Your sessions</p>
+        <div id="sessions-list" class="stack">
+          <div class="skeleton skeleton-card"></div>
+          <div class="skeleton skeleton-card"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Concept explainer modal -->
+  <div class="modal-backdrop" id="concept-modal" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Ask about a concept</h2>
+        <button class="btn-icon" id="concept-close"><span id="close-icon-1"></span></button>
+      </div>
+      <div id="concept-form" class="stack">
+        <div>
+          <label class="eyebrow" for="concept-subject">Subject</label>
+          <select id="concept-subject" class="input" style="margin-top: var(--sp-2);"></select>
+        </div>
+        <div>
+          <label class="eyebrow" for="concept-text">Concept</label>
+          <input id="concept-text" class="input" style="margin-top: var(--sp-2);" placeholder="e.g. eigenvalues" />
+        </div>
+        <div>
+          <label class="eyebrow" for="concept-depth">Depth</label>
+          <select id="concept-depth" class="input" style="margin-top: var(--sp-2);">
+            <option value="quick">Quick</option>
+            <option value="standard" selected>Standard</option>
+            <option value="deep">Deep</option>
+          </select>
+        </div>
+        <button class="btn btn-accent btn-block" id="concept-submit">Explain it</button>
+      </div>
+      <div id="concept-result" class="stack" hidden>
+        <div id="concept-answer" style="white-space: pre-wrap; line-height: var(--leading-normal);"></div>
+        <button class="btn btn-ghost btn-block" id="concept-again">Ask another</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photo transcription picker modal -->
+  <div class="modal-backdrop" id="photo-modal" hidden>
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Pick a problem</h2>
+        <button class="btn-icon" id="photo-modal-close"><span id="close-icon-2"></span></button>
+      </div>
+      <p class="text-dim" style="margin-bottom: var(--sp-4);">Marg found these on the page — choose one to work on.</p>
+      <div id="photo-problems-list" class="stack"></div>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
