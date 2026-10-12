@@ -16,6 +16,11 @@ process.env.NODE_ENV = 'test';
 process.env.AI_PROVIDER = 'mock';
 process.env.JWT_SECRET = 'test-secret-not-for-production';
 process.env.STORE_DRIVER = 'memory';
+// Most test files share one guest token across many requests, which would
+// otherwise trip the real (default: 10) guest quota partway through an
+// unrelated test. `quota.test.js` sets its own tiny limit before importing
+// this file, so `??=` only fills in a default — it never overrides that.
+process.env.GUEST_MESSAGE_LIMIT ??= '1000';
 
 const { createApp } = await import('../src/app.js');
 

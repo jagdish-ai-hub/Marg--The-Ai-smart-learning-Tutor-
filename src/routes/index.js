@@ -15,6 +15,7 @@ import multer from 'multer';
 import { z } from 'zod';
 
 import { requireAuth } from '../middleware/auth.js';
+import { enforceMessageQuota } from '../middleware/quota.js';
 import { validateBody, validateQuery } from '../middleware/validate.js';
 import { generalLimiter, aiLimiter } from '../middleware/rateLimit.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -74,6 +75,14 @@ const v1 = Router();
 /** Creates an anonymous guest account. The frontend's very first call. */
 v1.post('/auth/guest', generalLimiter, asyncHandler(authController.createGuest));
 
+/** Exchanges a verified Google sign-in (via Neon Auth) for a Marg account. */
+v1.post(
+  '/auth/google',
+  generalLimiter,
+  validateBody(z.object({ neonAuthToken: z.string().min(1) })),
+  asyncHandler(authController.google),
+);
+
 /** Exchanges a valid token for a fresh one. */
 v1.post('/auth/refresh', generalLimiter, requireAuth, asyncHandler(authController.refresh));
 
@@ -95,6 +104,7 @@ v1.post(
   '/sessions',
   aiLimiter,
   requireAuth,
+  asyncHandler(enforceMessageQuota),
   validateBody(z.object({
     subjectId,
     problem: z.string().trim().min(3, 'Tell Marg what you are stuck on.').max(4000),
@@ -134,6 +144,7 @@ v1.post(
   '/sessions/:id/ask',
   aiLimiter,
   requireAuth,
+  asyncHandler(enforceMessageQuota),
   validateBody(z.object({
     message: z.string().trim().min(1, 'Type something to ask.').max(4000),
     mode,
@@ -152,6 +163,7 @@ v1.get(
   '/sessions/:id/ask/stream',
   aiLimiter,
   requireAuth,
+  asyncHandler(enforceMessageQuota),
   validateQuery(z.object({
     message: z.string().trim().min(1).max(4000),
     mode,
@@ -165,18 +177,26 @@ v1.post(
   '/sessions/:id/hint',
   aiLimiter,
   requireAuth,
+  asyncHandler(enforceMessageQuota),
   validateBody(z.object({ stepIndex: z.coerce.number().int().min(1).optional() })),
   asyncHandler(tutorController.hint),
 );
 
 /** The friction gate: first call hints, second call reveals. */
-v1.post('/sessions/:id/reveal', aiLimiter, requireAuth, asyncHandler(tutorController.reveal));
+v1.post(
+  '/sessions/:id/reveal',
+  aiLimiter,
+  requireAuth,
+  asyncHandler(enforceMessageQuota),
+  asyncHandler(tutorController.reveal),
+);
 
 /** Marks the student's working and names the step that broke. */
 v1.post(
   '/sessions/:id/check',
   aiLimiter,
   requireAuth,
+  asyncHandler(enforceMessageQuota),
   validateBody(z.object({
     attempt: z.string().trim().min(1, 'Paste your working so Marg can mark it.').max(8000),
     stepId: z.string().optional(),
@@ -189,6 +209,7 @@ v1.post(
   '/sessions/:id/explain',
   aiLimiter,
   requireAuth,
+  asyncHandler(enforceMessageQuota),
   validateBody(z.object({
     stepId: z.string().optional(),
     question: z.string().trim().max(1000).optional(),

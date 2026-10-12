@@ -71,7 +71,9 @@ export function createMemoryStore() {
        * @returns {Promise<object>} The created user.
        */
       async create() {
-        const user = { id: newUserId(), isGuest: true, createdAt: now(), lastSeenAt: now() };
+        const user = {
+          id: newUserId(), isGuest: true, messageCount: 0, createdAt: now(), lastSeenAt: now(),
+        };
         users.set(user.id, user);
         return copy(user);
       },
@@ -95,6 +97,21 @@ export function createMemoryStore() {
       async touch(id) {
         const user = users.get(id);
         if (user) user.lastSeenAt = now();
+      },
+
+      /**
+       * Increments a guest's lifetime message count by one and returns the
+       * new total. Used to enforce the free-tier guest limit — see
+       * `middleware/quota.js`.
+       *
+       * @param {string} id - User id.
+       * @returns {Promise<number>} The count *after* this message.
+       */
+      async incrementMessageCount(id) {
+        const user = users.get(id);
+        if (!user) return 0;
+        user.messageCount = (user.messageCount ?? 0) + 1;
+        return user.messageCount;
       },
     },
 

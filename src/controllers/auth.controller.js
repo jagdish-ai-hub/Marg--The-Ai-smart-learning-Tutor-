@@ -13,6 +13,8 @@
 import { store } from '../store/index.js';
 import { issueToken } from '../middleware/auth.js';
 import { logger } from '../utils/logger.js';
+import { pgUsers } from '../store/pgUsers.js';
+import { verifyNeonAuthToken } from '../services/googleAuth.js';
 
 /**
  * `POST /api/v1/auth/guest` — creates an anonymous account.
@@ -81,5 +83,41 @@ export async function me(req, res) {
       createdAt: req.user.createdAt,
       lastSeenAt: req.user.lastSeenAt,
     },
+  });
+}
+
+/**
+ * `POST /api/v1/auth/google` — exchanges a Google sign-in for a Marg account.
+ *
+ * FOR THE FRONTEND:
+ *   1. Run the Google sign-in flow with Neon's Managed Better Auth SDK.
+ *   2. Call `authClient.token()` to get a short-lived Neon Auth JWT.
+ *   3. POST it here as `{ neonAuthToken }`.
+ *   4. Save the returned `data.token` exactly like a guest token — same
+ *      shape, same `Authorization: Bearer …` usage on every later request.
+ *
+ * The student's first sign-in creates their account; every later sign-in
+ * just finds it again, so this one endpoint handles both.
+ *
+ * Auth: none required (this is how a signed-in student gets their first Marg
+ * token, same role `POST /auth/guest` plays for guests).
+ * Body: `{ neonAuthToken: string }`
+ * Returns: `{ user, token, expiresAt }`
+ *
+ * @param {import('express').Request} req - The request.
+ * @param {import('express').Response} res - The response.
+ * @returns {Promise<void>}
+ */
+export async function google(req, res) {
+  const { id, email } = await verifyNeonAuthToken(req.body.neonAuthToken);
+  const user = await pgUsers.findOrCreate({ id, email });
+  const { token, expiresAt } = issueToken({ id: user.id, isGuest: false });
+
+  logger.info('Signed-in user authenticated', { userId: user.id });
+
+  res.ok({
+    user: { id: user.id, isGuest: false, email: user.email, createdAt: user.createdAt },
+    token,
+    expiresAt,
   });
 }

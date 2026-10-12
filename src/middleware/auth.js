@@ -12,21 +12,24 @@
  * The token is a JWT: a signed blob containing the user id. Signed, not
  * encrypted — anyone can read what is inside, but nobody can change it without
  * the secret. So it must never carry anything private, and it does not: just
- * the user id and an expiry.
+ * the user id, whether they are a guest, and an expiry.
  *
- * Adding real accounts later means adding an email/password route that issues
- * the same kind of token. Nothing else in the codebase has to change.
+ * Signed-in students (Google, via Neon Auth — see `controllers/auth.controller.js`
+ * `google()`) get the exact same kind of token, just with `guest: false`. That
+ * is what keeps this file — and everything downstream of `requireAuth` — from
+ * needing to know Google exists at all.
  */
 
 import jwt from 'jsonwebtoken';
 import { env } from '../config/env.js';
 import { ApiError } from '../utils/ApiError.js';
 import { store } from '../store/index.js';
+import { pgUsers } from '../store/pgUsers.js';
 
 /**
  * Creates a signed token for a user.
  *
- * @param {object} user - The user record. Only `id` is used.
+ * @param {object} user - The user record. Only `id` and `isGuest` are used.
  * @returns {{token: string, expiresAt: string}} The token and when it expires.
  *
  * @example
@@ -35,7 +38,7 @@ import { store } from '../store/index.js';
  */
 export function issueToken(user) {
   const token = jwt.sign(
-    { sub: user.id, guest: true },
+    { sub: user.id, guest: user.isGuest !== false },
     env.JWT_SECRET,
     { expiresIn: env.JWT_TTL },
   );
@@ -94,18 +97,23 @@ export async function requireAuth(req, res, next) {
     ));
   }
 
-  const user = await store.users.findById(payload.sub);
+  // Guests live in the in-memory store; signed-in students live in Postgres
+  // (see pgUsers.js). The token says which one to look in, so nothing past
+  // this point needs to care which kind of account it is.
+  const users = payload.guest ? store.users : pgUsers;
+  const user = await users.findById(payload.sub);
   if (!user) {
-    // The signature was valid but the user is gone — which happens routinely
-    // with the in-memory store, since a restart wipes every user while the
-    // tokens in browsers stay valid. Treat it as expired so the frontend's
-    // normal 401 handling gets a fresh guest account.
+    // For guests this happens routinely: a restart wipes the in-memory store
+    // while tokens in browsers stay valid. Treat it as expired so the
+    // frontend's normal 401 handling gets a fresh guest account. For a
+    // signed-in student this should not happen at all (their row persists),
+    // but the safe response is the same either way: sign in again.
     return next(ApiError.unauthenticated(
       'That account no longer exists. Call POST /api/v1/auth/guest for a new token.',
     ));
   }
 
-  await store.users.touch(user.id);
+  await users.touch(user.id);
   req.user = user;
   next();
 }

@@ -178,6 +178,11 @@ if (isProduction && JWT_SECRET === 'change-me-to-a-long-random-string') {
 
 const CORS_ORIGINS = readList('CORS_ORIGINS', 'http://localhost:5173,http://localhost:3000');
 
+// Signed-in accounts (Google, via Neon Auth) are optional. Without these two,
+// /auth/google simply returns 503 — guest mode still works on its own.
+const DATABASE_URL = readString('DATABASE_URL');
+const NEON_AUTH_BASE_URL = readString('NEON_AUTH_BASE_URL');
+
 /**
  * The validated configuration for the whole application.
  *
@@ -190,7 +195,9 @@ const CORS_ORIGINS = readList('CORS_ORIGINS', 'http://localhost:5173,http://loca
  *   OPENAI_COMPATIBLE_API_KEY: string, OPENAI_COMPATIBLE_BASE_URL: string,
  *   OPENAI_COMPATIBLE_MODEL: string, STORE_DRIVER: string, STRICT_SCOPE: boolean,
  *   DEFAULT_ANSWER_POLICY: string, RATE_LIMIT_AI_PER_MIN: number,
- *   RATE_LIMIT_GENERAL_PER_MIN: number, MAX_UPLOAD_MB: number
+ *   RATE_LIMIT_GENERAL_PER_MIN: number, MAX_UPLOAD_MB: number,
+ *   DATABASE_URL: string, NEON_AUTH_BASE_URL: string,
+ *   GUEST_MESSAGE_LIMIT: number, SIGNED_IN_DAILY_MESSAGE_LIMIT: number
  * }>}
  */
 export const env = Object.freeze({
@@ -227,6 +234,12 @@ export const env = Object.freeze({
 
   // Storage
   STORE_DRIVER: readEnum('STORE_DRIVER', VALID_STORE_DRIVERS, 'memory'),
+
+  // Signed-in accounts (optional — see above)
+  DATABASE_URL,
+  NEON_AUTH_BASE_URL,
+  GUEST_MESSAGE_LIMIT: readNumber('GUEST_MESSAGE_LIMIT', 10),
+  SIGNED_IN_DAILY_MESSAGE_LIMIT: readNumber('SIGNED_IN_DAILY_MESSAGE_LIMIT', 30),
 
   // Tutoring behaviour
   STRICT_SCOPE: readBoolean('STRICT_SCOPE', true),

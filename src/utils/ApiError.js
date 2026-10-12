@@ -52,6 +52,12 @@ export const ErrorCodes = {
   PROVIDER_BAD_RESPONSE: 'PROVIDER_BAD_RESPONSE',
   /** The selected provider cannot handle images. */
   VISION_UNSUPPORTED: 'VISION_UNSUPPORTED',
+  /** A guest has used all their free messages. Sign in with Google for more. */
+  GUEST_LIMIT_REACHED: 'GUEST_LIMIT_REACHED',
+  /** A signed-in student has used today's message allowance. */
+  DAILY_LIMIT_REACHED: 'DAILY_LIMIT_REACHED',
+  /** Google sign-in was attempted, but the server has no DATABASE_URL/NEON_AUTH_BASE_URL set. */
+  SIGNIN_UNAVAILABLE: 'SIGNIN_UNAVAILABLE',
   /** Something unexpected broke on our side. */
   INTERNAL_ERROR: 'INTERNAL_ERROR',
 };
@@ -171,5 +177,29 @@ export class ApiError extends Error {
    */
   static internal(message = 'Something went wrong on our side.') {
     return new ApiError(500, ErrorCodes.INTERNAL_ERROR, message);
+  }
+
+  /**
+   * 429 — a message quota has run out. `code` distinguishes a guest's
+   * lifetime cap from a signed-in student's daily cap, so the frontend can
+   * show "sign in" versus "come back tomorrow".
+   *
+   * @param {string} code - `GUEST_LIMIT_REACHED` or `DAILY_LIMIT_REACHED`.
+   * @param {string} message - What ran out, and what to do about it.
+   * @returns {ApiError}
+   */
+  static quotaExceeded(code, message) {
+    return new ApiError(429, code, message);
+  }
+
+  /**
+   * 503 — a feature that needs optional configuration (Google sign-in needs
+   * `DATABASE_URL` and `NEON_AUTH_BASE_URL`) was called without it being set.
+   *
+   * @param {string} message - What is missing.
+   * @returns {ApiError}
+   */
+  static unavailable(message) {
+    return new ApiError(503, ErrorCodes.SIGNIN_UNAVAILABLE, message);
   }
 }
