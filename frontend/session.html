@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Marg — session</title>
+  <script>
+    // Public config read by js/config.js — not a secret, just where this
+    // deployment's backend and Neon Auth project live. Override both for a
+    // deployment other than this one.
+    window.MARG_NEON_AUTH_URL = 'https://ep-frosty-poetry-b7qn2tc2.neonauth.c-13.us-east-1.aws.neon.tech/marg/auth';
+  </script>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#0d1512" />
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />

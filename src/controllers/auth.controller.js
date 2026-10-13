@@ -80,6 +80,7 @@ export async function me(req, res) {
     user: {
       id: req.user.id,
       isGuest: req.user.isGuest,
+      ...(req.user.email && { email: req.user.email }),
       createdAt: req.user.createdAt,
       lastSeenAt: req.user.lastSeenAt,
     },

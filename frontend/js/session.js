@@ -4,7 +4,7 @@
  * and inline practice sets.
  */
 
-import { MargClient } from './marg-client.js';
+import { MargClient, isQuotaError } from './marg-client.js';
 import { API_BASE } from './config.js';
 import { icons } from './icons.js';
 import { escapeHtml, toast } from './format.js';
@@ -14,7 +14,7 @@ import { registerServiceWorker } from './pwa.js';
 registerServiceWorker();
 
 const marg = new MargClient(API_BASE);
-renderShell();
+renderShell(undefined, marg);
 
 // A hash, not a query string — see the comment in subjects-ui.js: some static
 // hosts 301-redirect "?query=strings" away, but a hash never reaches the server.
@@ -279,7 +279,9 @@ el.composerInput.addEventListener('keydown', (e) => {
 window.addEventListener('beforeunload', () => cancelStream?.());
 
 function reportError(err) {
-  if (err.code === 'RATE_LIMITED') {
+  if (err.code === 'RATE_LIMITED' || isQuotaError(err)) {
+    // The backend's message already says exactly what to do next — sign in
+    // for more today, or come back tomorrow — so just show it as-is.
     toast(err.message, { variant: 'danger' });
   } else if (err.code === 'SESSION_NOT_FOUND') {
     toast('This session no longer exists.', { variant: 'danger' });

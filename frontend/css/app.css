@@ -61,9 +61,29 @@ header:has(.shell-inner) {
   padding: var(--sp-5);
 }
 
+.shell-account-slot { display: flex; align-items: center; min-width: 0; }
+
+.shell-account-slot #shell-signin-btn,
+.shell-account-slot .shell-account {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--text-sm);
+}
+
+.shell-account-slot .shell-account {
+  color: var(--text-dim);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (max-width: 640px) {
   .shell-nav__link span:last-child { display: none; }
   .shell-nav__link { padding: var(--sp-2); }
+  .shell-account-slot #shell-signin-btn span:last-child,
+  .shell-account-slot .shell-account span:last-child { display: none; }
 }
 
 /* ==========================================================================

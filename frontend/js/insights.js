@@ -15,7 +15,7 @@ import { registerServiceWorker } from './pwa.js';
 registerServiceWorker();
 
 const marg = new MargClient(API_BASE);
-renderShell('insights');
+renderShell('insights', marg);
 
 const el = {
   windowSelect: document.getElementById('window-select'),

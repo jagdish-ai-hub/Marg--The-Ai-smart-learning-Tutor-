@@ -29,11 +29,29 @@ export class MargError extends Error {
   }
 }
 
+/**
+ * True for a `MargError` raised by the free-tier message quota — guests
+ * capped at a lifetime total, signed-in students capped per day. Pages
+ * that send messages (app.js, session.js) use this to show a sign-in
+ * prompt instead of a generic error toast.
+ *
+ * @param {unknown} error
+ * @returns {boolean}
+ */
+export function isQuotaError(error) {
+  return error instanceof MargError
+    && (error.code === 'GUEST_LIMIT_REACHED' || error.code === 'DAILY_LIMIT_REACHED');
+}
+
 export class MargClient {
   /** @param {string} baseUrl */
   constructor(baseUrl = 'http://localhost:4000') {
     this.baseUrl = baseUrl.replace(/\/$/, '');
     this.token = localStorage.getItem('marg_token');
+    // Defaults true so a brand-new visitor (no token yet, nothing in
+    // localStorage) reads as a guest rather than as mistakenly signed in.
+    this.isGuest = localStorage.getItem('marg_is_guest') !== 'false';
+    this.email = localStorage.getItem('marg_email') || null;
   }
 
   /**
@@ -45,17 +63,70 @@ export class MargClient {
     return this.token;
   }
 
+  /**
+   * Stores the result of any sign-in (guest or Google) in both memory and
+   * localStorage, so the next page load — and the next tab — know who this
+   * is without another round trip.
+   * @private
+   * @param {{token: string, user: {isGuest: boolean, email?: string}}} data
+   */
+  #setAuth({ token, user }) {
+    this.token = token;
+    this.isGuest = user.isGuest;
+    this.email = user.email ?? null;
+    localStorage.setItem('marg_token', token);
+    localStorage.setItem('marg_is_guest', String(user.isGuest));
+    if (user.email) localStorage.setItem('marg_email', user.email);
+    else localStorage.removeItem('marg_email');
+  }
+
   /** @returns {Promise<{user: object, token: string, expiresAt: string}>} */
   async registerGuest() {
     const res = await fetch(`${this.baseUrl}/api/v1/auth/guest`, { method: 'POST' });
     const body = await res.json();
-    this.token = body.data.token;
-    localStorage.setItem('marg_token', this.token);
+    this.#setAuth(body.data);
     return body.data;
   }
 
   /**
-   * Internal: makes a request, retrying once with a fresh guest token on 401.
+   * Exchanges a verified Google sign-in for a Marg account. Call this with
+   * the token from `auth.js`'s `getGoogleToken()`, right after a Google
+   * session appears.
+   *
+   * @param {string} neonAuthToken - The raw JWT from Neon Auth.
+   * @returns {Promise<{user: object, token: string, expiresAt: string}>}
+   */
+  async signInWithGoogle(neonAuthToken) {
+    const res = await fetch(`${this.baseUrl}/api/v1/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ neonAuthToken }),
+    });
+    const body = await res.json();
+    if (!body.ok) {
+      throw new MargError(body.error.code, body.error.message, body.error.details, body.requestId);
+    }
+    this.#setAuth(body.data);
+    return body.data;
+  }
+
+  /**
+   * Drops the Marg account token, so the next request re-registers as a
+   * fresh guest. Does not touch the separate Google session — pair with
+   * `auth.js`'s `signOutOfGoogle()` for a full sign-out.
+   * @returns {void}
+   */
+  signOut() {
+    this.token = null;
+    this.isGuest = true;
+    this.email = null;
+    localStorage.removeItem('marg_token');
+    localStorage.removeItem('marg_is_guest');
+    localStorage.removeItem('marg_email');
+  }
+
+  /**
+   * Internal: makes a request, retrying once on 401.
    * @param {string} path
    * @param {{ method?: string, body?: object, retry?: boolean }} [options]
    * @returns {Promise<any>}
@@ -72,11 +143,18 @@ export class MargClient {
 
     const payload = await res.json();
 
-    // The stored account is gone (e.g. the server restarted). Get a new one
-    // and try again, so the user never sees a spurious error.
     if (res.status === 401 && retry) {
-      await this.registerGuest();
-      return this.#request(path, { method, body, retry: false });
+      // A guest's account is gone (e.g. the server restarted) — get a new
+      // one and retry, so they never see a spurious error. A signed-in
+      // student's token should not just vanish like that; if it somehow
+      // does (expired after 30 days), do not silently demote them to a
+      // fresh guest — sign them out and let the caller's error handling
+      // prompt them to sign in again.
+      if (this.isGuest) {
+        await this.registerGuest();
+        return this.#request(path, { method, body, retry: false });
+      }
+      this.signOut();
     }
 
     if (!payload.ok) {

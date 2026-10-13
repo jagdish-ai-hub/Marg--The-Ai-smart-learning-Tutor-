@@ -4,7 +4,7 @@
  * concept-explainer modal.
  */
 
-import { MargClient } from './marg-client.js';
+import { MargClient, isQuotaError } from './marg-client.js';
 import { API_BASE } from './config.js';
 import { icons } from './icons.js';
 import { escapeHtml, timeAgo, toast } from './format.js';
@@ -15,7 +15,7 @@ import { registerServiceWorker } from './pwa.js';
 registerServiceWorker();
 
 const marg = new MargClient(API_BASE);
-renderShell('home');
+renderShell('home', marg);
 
 /** @type {Map<string, object>} subjectId -> subject, filled once subjects load */
 const subjectsById = new Map();
@@ -113,8 +113,10 @@ async function handleStartSession() {
   } catch (err) {
     if (err.code === 'VALIDATION_FAILED') {
       setComposerError(err.details?.fields?.[0]?.message ?? err.message);
-    } else if (err.code === 'RATE_LIMITED') {
-      toast(err.message, { variant: 'danger' });
+    } else if (err.code === 'RATE_LIMITED' || isQuotaError(err)) {
+      // The backend's own message already says exactly what to do next —
+      // sign in for more today, or come back tomorrow.
+      setComposerError(err.message);
     } else {
       toast(`Marg couldn't start that session. Reference: ${err.requestId ?? 'n/a'}`, { variant: 'danger' });
     }

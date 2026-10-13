@@ -48,4 +48,6 @@ export const icons = {
   streak: (opts) => svg('<path d="M12 2s5 5.5 5 10a5 5 0 0 1-10 0c0-1.7 1-3 1-3s.5 2 2 2c1 0 1-1 1-2 0-2-2-4-2-4 3-1 3-3 3-3Z"/>', opts),
 
   refresh: (opts) => svg('<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/>', opts),
+
+  user: (opts) => svg('<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>', opts),
 };
