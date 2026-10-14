@@ -77,6 +77,7 @@ Restart, and Marg is live.
 | looking up an endpoint | **[docs/API.md](docs/API.md)** — every route with curl and fetch examples |
 | wondering how Marg decides what to do | **[docs/TUTORING-MODEL.md](docs/TUTORING-MODEL.md)** — modes, the answer gate, the guardrails |
 | changing the code | **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — how the pieces fit, and the database migration path |
+| deploying this | **[docs/DOCKER.md](docs/DOCKER.md)** — a ready-to-use Dockerfile, kept as markdown until you need it |
 
 ---
 

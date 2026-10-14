@@ -23,7 +23,7 @@ How the pieces fit together, and why they are arranged this way.
        │
        ├──────────────► ai/registry.js ──► providers/ (gemini, openrouter, mock)
        │
-       └──────────────► store/index.js ──► memory.js  (turso.js later)
+       └──────────────► store/index.js ──► memory.js (guests) + pgSessionStore.js (signed in)
 ```
 
 The rule that keeps this honest: **each layer only talks to the one below it.**
@@ -104,115 +104,58 @@ the migration, which is the worst possible time to find it.
 
 ---
 
-## Moving to Turso
+## Session history: memory for guests, Postgres for signed-in students
 
-Turso is the recommended next step: SQLite-compatible, generous free tier, and
-one client (`@libsql/client`) that works against a local file in development and
-Turso cloud in production. Sessions, messages, and steps are a naturally
-relational shape, and it needs no server process to run locally.
+This is done, not a future plan — `src/store/pgSessionStore.js` and the
+router in `src/store/index.js`. It's here because it's the same "swap the
+backend without touching a service" promise the section above describes, just
+exercised for real, and because the result is a *hybrid*, not a wholesale
+swap — worth explaining why.
 
-The migration is a contained job.
+A guest has no account, so there is nothing to keep durable for them: memory
+is free, instant, and the ephemeral-ness is the deal they're getting (see
+`docs/PROGRESS.md`, "Accounts & the free tier"). A signed-in student made an
+account specifically so their history sticks, so *their* sessions, steps,
+messages, practice sets, and mistakes live in Postgres — the same Neon
+database as their account — instead.
 
-### Checklist
+**The routing trick: ids already carry their backend, not just their kind.**
+`utils/ids.js`'s whole premise is that a prefix tells you what something is
+at a glance (`ses_`, `msg_`, …). Postgres-owned records extend that one step:
+they get a *second* prefix layer — `pses_`, `pmsg_`, `pstp_`, `pset_`, `pmst_`
+— so `store/index.js` can route `store.messages.append({ sessionId, … })`
+correctly with one string check (`sessionId.startsWith('p')`), no database
+lookup, no extra parameter threaded through every call site. The two calls
+that start from scratch (`sessions.create`, `practiceSets.create`,
+`mistakes.record` — anything keyed by `userId` instead of an existing id)
+route on `userId` instead: a guest's id is always `usr_…`
+(`utils/ids.js`'s `newUserId()`); a signed-in student's is whatever Neon
+Auth's `sub` claim gave it (a bare UUID, never `usr_`-prefixed) — see
+`pgUsers.js`.
 
-1. **Install the client**
-   ```bash
-   npm install @libsql/client
-   ```
+**No service or controller changes were needed at all.** Every one of them
+already called `store.sessions.*`/`store.messages.*`/etc. generically — that
+was the whole point of the indirection described above — so the router in
+`store/index.js` is the entire diff.
 
-2. **Add the schema.** Six tables mirroring the repositories in `memory.js`:
+### Adding a new store-backed entity
 
-   ```sql
-   CREATE TABLE users (
-     id TEXT PRIMARY KEY, is_guest INTEGER NOT NULL DEFAULT 1,
-     created_at TEXT NOT NULL, last_seen_at TEXT NOT NULL
-   );
-
-   CREATE TABLE sessions (
-     id TEXT PRIMARY KEY,
-     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-     subject_id TEXT NOT NULL, title TEXT, topic TEXT,
-     problem TEXT NOT NULL, restated_problem TEXT,
-     final_answer TEXT,                      -- never serialised to the client
-     status TEXT NOT NULL DEFAULT 'active', mode TEXT,
-     answer_policy TEXT NOT NULL DEFAULT 'on_request',
-     answer_revealed INTEGER NOT NULL DEFAULT 0,
-     current_step_index INTEGER NOT NULL DEFAULT 1,
-     reveal_count INTEGER NOT NULL DEFAULT 0,
-     attempt_count INTEGER NOT NULL DEFAULT 0,
-     created_at TEXT NOT NULL, updated_at TEXT NOT NULL
-   );
-   CREATE INDEX idx_sessions_user ON sessions(user_id, created_at DESC);
-
-   CREATE TABLE steps (
-     id TEXT PRIMARY KEY,
-     session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
-     idx INTEGER NOT NULL, instruction TEXT NOT NULL,
-     skill TEXT, status TEXT NOT NULL DEFAULT 'pending', created_at TEXT NOT NULL
-   );
-   CREATE INDEX idx_steps_session ON steps(session_id, idx);
-
-   CREATE TABLE messages (
-     id TEXT PRIMARY KEY,
-     session_id TEXT NOT NULL REFERENCES sessions(id) ON DELETE CASCADE,
-     role TEXT NOT NULL, content TEXT NOT NULL, mode TEXT,
-     meta TEXT,                              -- JSON blob
-     created_at TEXT NOT NULL
-   );
-   CREATE INDEX idx_messages_session ON messages(session_id, created_at);
-
-   CREATE TABLE practice_sets (
-     id TEXT PRIMARY KEY,
-     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-     session_id TEXT, subject_id TEXT, skill TEXT,
-     problems TEXT NOT NULL,                 -- JSON, answers included
-     results TEXT, submitted_at TEXT, created_at TEXT NOT NULL
-   );
-
-   CREATE TABLE mistakes (
-     id TEXT PRIMARY KEY,
-     user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-     session_id TEXT, subject_id TEXT, topic TEXT, skill TEXT,
-     error_type TEXT NOT NULL, error_summary TEXT,
-     step_index INTEGER, created_at TEXT NOT NULL
-   );
-   CREATE INDEX idx_mistakes_user ON mistakes(user_id, created_at DESC);
-   ```
-
-3. **Write `src/store/turso.js`** exporting `createTursoStore()` with the same
-   six repositories and identical method signatures. `memory.js` is the
-   specification — match it method for method.
-
-4. **Add the driver** to the switch in `src/store/index.js`:
-   ```js
-   case 'turso':
-     return createTursoStore();
-   ```
-
-5. **Add the env vars** to `config/env.js` and `.env.example`:
-   ```
-   STORE_DRIVER=turso
-   TURSO_DATABASE_URL=libsql://your-db.turso.io   # or file:local.db in dev
-   TURSO_AUTH_TOKEN=
-   ```
-   Add `'turso'` to `VALID_STORE_DRIVERS`.
-
-6. **Run the test suite.** It talks to the API over HTTP and never imports the
-   store directly, so it works unchanged as a migration check. Point
-   `STORE_DRIVER` at a temporary database and run `npm test` — green means the
-   new driver honours the same contract.
-
-**No service, controller, or route changes.** That is the whole point of the
-indirection.
+Follow the same shape: give it a kind prefix in `utils/ids.js`, implement it
+in both `memory.js` and `pgSessionStore.js` with identical method signatures
+and return shapes (field names and all — nothing downstream should be able
+to tell which one answered), then add the two-line dispatch to
+`store/index.js`. The existing repositories are the specification; match them
+method for method.
 
 ### Two things to watch
 
-- **`store.sessions.findById(id, userId)` takes the user id** and returns `null`
-  when it does not match. Keep that in the SQL (`WHERE id = ? AND user_id = ?`).
-  Ownership is enforced in one place precisely so it cannot be forgotten in one
-  route and leak another student's work.
-- **`meta`, `problems`, and `results` are JSON blobs.** Serialise on write,
-  parse on read, so callers keep seeing plain objects.
+- **`sessions.findById(id, userId)` takes the user id** and returns `null`
+  when it does not match, in both backends. Ownership is checked in one
+  place precisely so it cannot be forgotten in one route and leak another
+  student's work.
+- **`meta`, `problems`, and `results` are JSON/JSONB.** `pgSessionStore.js`
+  serialises on write and the driver parses JSONB back to a plain object on
+  read, so callers see the same shape either way.
 
 ---
 
@@ -274,16 +217,19 @@ See [TUTORING-MODEL.md](TUTORING-MODEL.md#the-answer-gate).
 npm test
 ```
 
-52 tests, entirely offline, using `AI_PROVIDER=mock`. Each file boots a real
+54 tests, entirely offline, using `AI_PROVIDER=mock`. Each file boots a real
 server on a random free port and talks to it over HTTP, so routing, middleware,
 validation, and serialisation are all exercised — that is where most real bugs
-live.
+live. Every test uses a guest account, so none of them ever touch Postgres —
+that's `quota.test.js`'s own comment on why it has to set its guest limit
+*before* importing the shared test helpers.
 
 | File | Covers |
 |---|---|
 | `smoke.test.js` | Happy path, auth, ownership, every error code |
 | `tutor.test.js` | Marking, the reveal gate, modes, SSE, practice |
 | `guard.test.js` | The scope/integrity decision table, including false-refusal cases |
+| `quota.test.js` | The guest message cap and its 429 |
 
 Because the mock classifies with keyword heuristics rather than a real model,
 `guard.test.js` tests the **policy** — the decision table, the refusal shape,
@@ -294,7 +240,14 @@ split: the policy is ours to get right and ours to regress.
 
 ## Deploying
 
-Any Node host works — Railway, Render, Fly, a container. Requirements:
+Any Node host works — Railway, Render, Fly, a container (a ready-to-use
+Dockerfile is at [docs/DOCKER.md](DOCKER.md), kept as markdown until it's
+actually wired up). Not Cloudflare Workers as-is: this is a long-running
+Express process with an in-memory half of the store, and Workers isolates
+are stateless and can be evicted anytime — see `docs/PROGRESS.md`'s
+"Deploying" section for exactly what a Workers port would need to change.
+
+Requirements:
 
 - Node 20+ (uses built-in `fetch` and `AbortSignal.any`)
 - `JWT_SECRET` set to a real random value; the app refuses to start in
@@ -303,6 +256,10 @@ Any Node host works — Railway, Render, Fly, a container. Requirements:
 - One AI provider key
 - `NODE_ENV=production`, which switches logs to JSON and strips stack traces
   from error responses
+- Optionally, `DATABASE_URL` and `NEON_AUTH_BASE_URL` to turn on Google
+  sign-in and persistent session history for signed-in students — see
+  `.env.example`. Without them the app runs guest-only, exactly as before
+  either feature existed.
 
 Health checks: `/health` for liveness, `/health/ready` for readiness. The
 readiness check returns 503 when configuration is broken, so a load balancer
