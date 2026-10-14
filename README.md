@@ -72,6 +72,7 @@ Restart, and Marg is live.
 
 | You are… | Read this |
 |---|---|
+| checking what's built so far | **[docs/PROGRESS.md](docs/PROGRESS.md)** — a status check, not a how-it-works doc |
 | a frontend engineer wiring up the UI | **[docs/FRONTEND-GUIDE.md](docs/FRONTEND-GUIDE.md)** — auth flow, streaming, and a copy-paste client |
 | looking up an endpoint | **[docs/API.md](docs/API.md)** — every route with curl and fetch examples |
 | wondering how Marg decides what to do | **[docs/TUTORING-MODEL.md](docs/TUTORING-MODEL.md)** — modes, the answer gate, the guardrails |
